@@ -89,8 +89,9 @@ public class ShipmentForm extends JFrame {
         field.setAlignmentX(Component.LEFT_ALIGNMENT);
         field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
         
-        panel.add(field);
         panel.add(label);
+        panel.add(field);
+      
         //adds padding
         panel.add(Box.createRigidArea(new Dimension(0, 8))); 
         return panel;
@@ -113,10 +114,16 @@ public class ShipmentForm extends JFrame {
             shipment.setDestination(addressField.getText() + ", " + zoneCombo.getSelectedItem());
             shipment.setTrackingNumber("TRK" + new Random().nextInt(1000000));
             shipment.setCost(calculateCost(shipment.getWeight(), zoneCombo.getSelectedIndex() + 1, shipment.getType()));
-
+            
+            
+            //sends info to clientconnection to be processed to send to the server
+            //awaits response from clientconnection
+            
             String response = ClientConnection.addShipment(shipment);
             JOptionPane.showMessageDialog(this, response);
-
+           
+            
+            //used to frequently update the shipments to the dashboard
             if (parentWindow != null) {
                 parentWindow.refreshShipments();
             }

@@ -18,14 +18,17 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         try (
-            // Create OutputStream first, then InputStream
+            // initilaize input output stream 
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
             String command = (String) in.readObject();
 
+            //switch used to determine which command will do what add/get
             switch (command) {
+            //command sent from ClientConnection getshipment method
                 case "GET_SHIPMENTS" -> handleGetShipments(in, out);
+                //command sent from ClientConnection add shipment method
                 case "ADD_SHIPMENT" -> handleAddShipment(in, out);
                 default -> {
                     out.writeObject("Unknown command");
@@ -37,17 +40,25 @@ public class ClientHandler implements Runnable {
             e.printStackTrace();
         } finally {
             try {
-                socket.close(); // ensure socket is closed after handling
+                socket.close(); 
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
+    
+    //handles all the database adding and fetching
+    
+    //accepts input output streams
     private void handleGetShipments(ObjectInputStream in, ObjectOutputStream out) throws Exception {
+    	//reads in customer id
         int customerId = (Integer) in.readObject();
 
+        //tries database connection
         try (Connection con = DatabaseConnection.getConnection()) {
+        	
+        	//database stuff
             PreparedStatement ps = con.prepareStatement(
                 "SELECT tracking_number, type, destination, cost, status FROM shipments WHERE customer_id=?"
             );
@@ -70,7 +81,9 @@ public class ClientHandler implements Runnable {
         }
     }
 
+  //accepts input output streams
     private void handleAddShipment(ObjectInputStream in, ObjectOutputStream out) throws Exception {
+    	//reads in shipment
         Shipment shipment = (Shipment) in.readObject();
 
         try (Connection con = DatabaseConnection.getConnection()) {

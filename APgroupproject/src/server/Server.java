@@ -11,12 +11,19 @@ public class Server {
 
     public Server(int port) {
         try {
+        	
+        	//creates server socket and takes in port
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on port " + port);
-
+   
+            
+            //used to continuously listen for client requests
             while (true) {
+            	//connects client socket
                 Socket clientSocket = serverSocket.accept();
                 System.out.println(" Client connected: " + clientSocket.getInetAddress());
+                
+                //multithreading initialization
                 new Thread(new ClientHandler(clientSocket)).start();
             }
 

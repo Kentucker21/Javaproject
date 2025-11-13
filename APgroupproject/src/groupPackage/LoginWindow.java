@@ -19,7 +19,7 @@ public class LoginWindow extends JFrame {
         super("Login Page");
         initializeComponents();
         AddComptoPanel();
-        ActivateButtons();
+        ActivateButtons(); 
         setWindowProperties();
     }
 
