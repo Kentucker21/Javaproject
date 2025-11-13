@@ -12,6 +12,7 @@ public class DatabaseConnection {
     
     
     public static Connection getConnection() {
+    	//try block to catch exception
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             return DriverManager.getConnection(URL, USER, PASSWORD);

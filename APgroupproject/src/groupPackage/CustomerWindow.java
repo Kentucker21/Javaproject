@@ -3,10 +3,13 @@ package groupPackage;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import customerHelper.ClientConnection;
 import customerHelper.DatabaseConnection;
+import customerHelper.Shipment;
 import customerHelper.ShipmentForm;
 
 import java.awt.*;
+import java.util.List;   
 import java.sql.*;
 
 public class CustomerWindow extends JFrame {
@@ -57,28 +60,21 @@ public class CustomerWindow extends JFrame {
         refreshShipments();
         setVisible(true);
     }
+    
+    
+    
+    //refresh is used to update the table anytime a new record is added to the database
 
     public void refreshShipments() {
-        try (Connection con = DatabaseConnection.getConnection()) {
-            String query = "SELECT tracking_number, type, destination, cost, status FROM shipments WHERE customer_id=?";
-            PreparedStatement ps = con.prepareStatement(query);
-            ps.setInt(1, currentUser.getId());
-            ResultSet rs = ps.executeQuery();
+        try {
+            List<Shipment> shipments = ClientConnection.getShipments(currentUser.getId());
 
-            
-            	//Jtable outline
             DefaultTableModel currentModel = new DefaultTableModel(new String[]{"Tracking No", "Type", "Destination", "Cost", "Status"}, 0);
             DefaultTableModel completedModel = new DefaultTableModel(new String[]{"Tracking No", "Type", "Destination", "Cost", "Status"}, 0);
 
-            while (rs.next()) {
-                Object[] row = {
-                    rs.getString("tracking_number"),
-                    rs.getString("type"),
-                    rs.getString("destination"),
-                    rs.getDouble("cost"),
-                    rs.getString("status")
-                };
-                if (rs.getString("status").equalsIgnoreCase("Delivered"))
+            for (Shipment s : shipments) {
+                Object[] row = { s.getTrackingNumber(), s.getType(), s.getDestination(), s.getCost(), s.getStatus() };
+                if ("Delivered".equalsIgnoreCase(s.getStatus()))
                     completedModel.addRow(row);
                 else
                     currentModel.addRow(row);
@@ -91,6 +87,7 @@ public class CustomerWindow extends JFrame {
             e.printStackTrace();
         }
     }
+
     
     
     

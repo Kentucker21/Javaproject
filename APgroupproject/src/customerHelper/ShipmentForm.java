@@ -21,10 +21,11 @@ public class ShipmentForm extends JFrame {
    
 
     public ShipmentForm(CustomerWindow parentWindow, int customerId) {
-        super("Enter Shipment Details");
+        super("Enter Shipment Details"); //form instructions title
         this.customerId = customerId;
         this.parentWindow=parentWindow; //debug instance
-
+        
+        //shipment main layout is borderLayout
         setLayout(new BorderLayout(10, 10));
         setSize(450, 550);
         setLocationRelativeTo(null);
@@ -37,6 +38,7 @@ public class ShipmentForm extends JFrame {
 
         //my main panel
         JPanel formPanel = new JPanel();
+        //inner panel for the fields uses boxlayout
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
         formPanel.setBorder(BorderFactory.createEmptyBorder(10, 40, 10, 40));
 
@@ -62,6 +64,8 @@ public class ShipmentForm extends JFrame {
 
         // Send button
         submitButton = new JButton("Submit");
+        
+        //uses setAlignmentx to center along the x axis
         submitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         submitButton.setPreferredSize(new Dimension(100, 40));
         submitButton.addActionListener(e -> submitShipment());
@@ -69,6 +73,7 @@ public class ShipmentForm extends JFrame {
         formPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         formPanel.add(submitButton);
 
+        //adds the inner form layout to the center
         add(new JScrollPane(formPanel), BorderLayout.CENTER);
 
         setVisible(true);
@@ -83,51 +88,39 @@ public class ShipmentForm extends JFrame {
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
         field.setAlignmentX(Component.LEFT_ALIGNMENT);
         field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-        panel.add(label);
-        panel.add(field);
         
+        panel.add(field);
+        panel.add(label);
         //adds padding
         panel.add(Box.createRigidArea(new Dimension(0, 8))); 
         return panel;
     }
+    
+    
+    //sends to the server
 
     private void submitShipment() {
-        try (Connection con = DatabaseConnection.getConnection()) {
-            String senderName = senderNameField.getText();
-            String senderPhone = senderPhoneField.getText();
-            String recipientName = recipientNameField.getText();
-            String recipientPhone = recipientPhoneField.getText();
-            double weight = Double.parseDouble(weightField.getText());
-            String dimensions = dimensionField.getText();
-            String type = (String) typeCombo.getSelectedItem();
-            String destination = addressField.getText() + ", " + zoneCombo.getSelectedItem();
-            String trackingNumber = "TRK" + new Random().nextInt(1000000);
-            double cost = calculateCost(weight, zoneCombo.getSelectedIndex() + 1, type);
+        try {
+            Shipment shipment = new Shipment();
+            shipment.setCustomerId(customerId);
+            shipment.setSenderName(senderNameField.getText());
+            shipment.setSenderPhone(senderPhoneField.getText());
+            shipment.setRecipientName(recipientNameField.getText());
+            shipment.setRecipientPhone(recipientPhoneField.getText());
+            shipment.setWeight(Double.parseDouble(weightField.getText()));
+            shipment.setDimensions(dimensionField.getText());
+            shipment.setType((String) typeCombo.getSelectedItem());
+            shipment.setDestination(addressField.getText() + ", " + zoneCombo.getSelectedItem());
+            shipment.setTrackingNumber("TRK" + new Random().nextInt(1000000));
+            shipment.setCost(calculateCost(shipment.getWeight(), zoneCombo.getSelectedIndex() + 1, shipment.getType()));
 
-            String sql = "INSERT INTO shipments (customer_id, tracking_number, sender_name, sender_phone, recipient_name, recipient_phone, weight, dimensions, type, destination, cost, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')";
+            String response = ClientConnection.addShipment(shipment);
+            JOptionPane.showMessageDialog(this, response);
 
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setInt(1, customerId);
-            ps.setString(2, trackingNumber);
-            ps.setString(3, senderName);
-            ps.setString(4, senderPhone);
-            ps.setString(5, recipientName);
-            ps.setString(6, recipientPhone);
-            ps.setDouble(7, weight);
-            ps.setString(8, dimensions);
-            ps.setString(9, type);
-            ps.setString(10, destination);
-            ps.setDouble(11, cost);
-
-            ps.executeUpdate();
-            JOptionPane.showMessageDialog(this, "Shipment submitted! Tracking No: " + trackingNumber);
-            
-            //debug instance
             if (parentWindow != null) {
                 parentWindow.refreshShipments();
             }
 
-            
             dispose();
 
         } catch (Exception ex) {
@@ -135,6 +128,10 @@ public class ShipmentForm extends JFrame {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
     }
+
+    
+    
+    
 
     private double calculateCost(double weight, int zone, String type) {
         double baseRate = 5.0;

@@ -1,6 +1,10 @@
 package customerHelper;
 
-public class Shipment {
+import java.io.Serializable;
+
+public class Shipment implements Serializable {
+    private static final long serialVersionUID = 1L; // Add this
+
     private int id;
     private int customerId;
     private String trackingNumber;
