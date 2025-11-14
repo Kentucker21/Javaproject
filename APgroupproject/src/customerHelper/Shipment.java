@@ -18,7 +18,16 @@ public class Shipment implements Serializable {
     private String destination;
     private double cost;
     private String status;
+    private String assignedDriver;
+    
 
+    public String getAssignedDriver() {
+        return assignedDriver;
+    }
+
+    public void setAssignedDriver(String assignedDriver) {
+        this.assignedDriver = assignedDriver;
+    }
     // Getters & Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }

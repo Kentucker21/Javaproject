@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
+import java.util.Random;
 
 public class RegistrationWindow extends JFrame {
     private JComboBox<String> roleCombo;
@@ -77,7 +78,23 @@ public class RegistrationWindow extends JFrame {
         }
 
         int newId = UserDatabase.getNextId(users);
+
+        
         User newUser = new User(newId, role, username, password);
+
+        // DRIVER: vehicle capacity
+        
+        if (role.equals("Driver")) {
+        	Random random=new Random();
+           int capacity = (random.nextInt(5)+1)*60;
+
+           
+
+            newUser.setVehicleCapacity(capacity);
+        }
+        
+
+        // Save updated user list
         users.add(newUser);
         UserDatabase.saveUsers(users);
 

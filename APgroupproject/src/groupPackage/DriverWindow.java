@@ -4,11 +4,11 @@ import java.awt.*;
 
 public class DriverWindow extends JFrame {
     public DriverWindow(User user) {
-        super("Clerk Window");
+        super("Driver Window");
         JLabel label = new JLabel("Welcome, " + user.getUsername() + " (ID: " + user.getId() + ")", SwingConstants.CENTER);
         add(label, BorderLayout.CENTER);
        
-        
+       
         setWindowProperties();
     }
     

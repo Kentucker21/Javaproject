@@ -87,6 +87,7 @@ public class LoginWindow extends JFrame {
         loginButton.addActionListener(e -> authenticate());
     }
 
+    
     private void authenticate() {
         String selectedRole = (String) role.getSelectedItem();
         String username = userName.getText().trim();
@@ -115,6 +116,8 @@ public class LoginWindow extends JFrame {
             case "Clerk" -> new ClerkWindow(user);
             case "Manager" -> new ManagerWindow(user);
             case "Driver" -> new DriverWindow(user);
+        
+            
         }
     }
 }

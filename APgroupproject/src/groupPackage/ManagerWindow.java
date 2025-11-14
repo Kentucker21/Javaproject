@@ -6,7 +6,7 @@ import java.awt.*;
 
 public class ManagerWindow extends JFrame {
     public ManagerWindow(User user) {
-        super("Clerk Window");
+        super("Manager Window");
         JLabel label = new JLabel("Welcome, " + user.getUsername() + " (ID: " + user.getId() + ")", SwingConstants.CENTER);
         add(label, BorderLayout.CENTER);
         

@@ -9,6 +9,7 @@ public class User implements Serializable {
     private String role;
     private String username;
     private String password;
+    private double vehicleCapacity = 0.0; // default for all users     drivers will utilize and clerks
 
     public User(int id, String role, String username, String password) {
         this.id = id;
@@ -25,6 +26,17 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return id + " - " + role + " - " + username;
+    }
+    
+    
+    
+    
+    public double getVehicleCapacity() {
+        return vehicleCapacity;
+    }
+
+    public void setVehicleCapacity(double vehicleCapacity) {
+        this.vehicleCapacity = vehicleCapacity;
     }
 }
 

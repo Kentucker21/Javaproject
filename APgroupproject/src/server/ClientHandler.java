@@ -59,20 +59,22 @@ public class ClientHandler implements Runnable {
         try (Connection con = DatabaseConnection.getConnection()) {
         	
         	//database stuff
-            PreparedStatement ps = con.prepareStatement(
-                "SELECT tracking_number, type, destination, cost, status FROM shipments WHERE customer_id=?"
-            );
+        	PreparedStatement ps = con.prepareStatement(
+        		    "SELECT tracking_number, type, destination, cost, status, assigned_driver FROM shipments WHERE customer_id=?"
+        		);
             ps.setInt(1, customerId);
             ResultSet rs = ps.executeQuery();
 
             List<Shipment> shipments = new ArrayList<>();
             while (rs.next()) {
                 Shipment s = new Shipment();
+                s.setId(rs.getInt("id"));
                 s.setTrackingNumber(rs.getString("tracking_number"));
                 s.setType(rs.getString("type"));
                 s.setDestination(rs.getString("destination"));
                 s.setCost(rs.getDouble("cost"));
                 s.setStatus(rs.getString("status"));
+                s.setAssignedDriver(rs.getString("assigned_driver"));
                 shipments.add(s);
             }
 
@@ -83,14 +85,17 @@ public class ClientHandler implements Runnable {
 
   //accepts input output streams
     private void handleAddShipment(ObjectInputStream in, ObjectOutputStream out) throws Exception {
-    	//reads in shipment
+        // Read the shipment object from the client
         Shipment shipment = (Shipment) in.readObject();
 
         try (Connection con = DatabaseConnection.getConnection()) {
             String sql = """
-                INSERT INTO shipments (customer_id, tracking_number, sender_name, sender_phone,
-                recipient_name, recipient_phone, weight, dimensions, type, destination, cost, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')
+                INSERT INTO shipments (
+                    customer_id, tracking_number, sender_name, sender_phone,
+                    recipient_name, recipient_phone, weight, dimensions,
+                    type, destination, cost
+                )
+                VALUES (?,?,?,?,?,?,?,?,?,?,?)
             """;
 
             PreparedStatement ps = con.prepareStatement(sql);
@@ -109,7 +114,8 @@ public class ClientHandler implements Runnable {
             ps.executeUpdate();
 
             out.writeObject("Shipment added successfully!");
-            out.flush(); // make sure client receives message
+            out.flush();
         }
     }
+
 }
